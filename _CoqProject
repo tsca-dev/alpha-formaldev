@@ -1,0 +1,9 @@
+-R ../tsca-formaldev tscaformaldev
+./util.v
+./ccgen_util.v
+./ccgen.v
+./fundme.v
+./wrapper.v
+./frozen.v
+./graveyard.v
+./crowdfunding.v

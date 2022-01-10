@@ -1,0 +1,35 @@
+(Pair { DIP 1
+            { NIL (pair (pair string (lambda (pair bytes bytes) (pair (list operation) bytes)))
+                        (pair bytes mutez)) } ;
+        LAMBDA
+          (pair bytes bytes)
+          (pair (list operation) bytes)
+          { { DUP ; CAR ; DIP 1 { CDR } } ;
+            UNPACK bytes ;
+            IF_NONE
+              { PUSH string "unpack param" ; FAILWITH }
+              { SWAP ;
+                UNPACK bytes ;
+                IF_NONE
+                  { PUSH string "unpack storage" ; FAILWITH }
+                  { SWAP ;
+                    PAIR ;
+                    DUP ;
+                    CAR ;
+                    UNPACK unit ;
+                    IF_NONE { PUSH string "unpack param" ; FAILWITH } { DROP 1 } ;
+                    CDR ;
+                    NIL operation ;
+                    PAIR ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    DIP 1 { PACK } ;
+                    PAIR } } } ;
+        PUSH string "main" ;
+        PAIR ;
+        PAIR ;
+        CONS }
+      { DROP 1 ;
+        LAMBDA
+          (map string address)
+          (list (pair string bytes))
+          { DROP 1 ; NIL (pair string bytes) } })

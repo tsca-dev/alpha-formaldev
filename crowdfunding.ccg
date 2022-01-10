@@ -1,0 +1,344 @@
+(Pair { DUP ;
+        DIP 1
+            { { DUP ; CAR ; DIP 1 { CDR } } ;
+              UNPACK
+                (pair (pair (set address) (map address mutez))
+                      (pair (pair bool timestamp) (pair timestamp timestamp))) } ;
+        DIP 1
+            { IF_NONE
+                { PUSH string "genparam is of wrong type" ; FAILWITH }
+                { DIP 1 { DROP 1 } ;
+                  DUP ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DIP 1 { DROP 1 } ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DIP 1 { DROP 1 } ;
+                  SIZE ;
+                  PUSH nat 0 ;
+                  COMPARE ;
+                  EQ ;
+                  IF { PUSH string "there must be at least one registered raiser" ; FAILWITH }
+                     {} ;
+                  DUP ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  DIP 1 { DROP 1 } ;
+                  DIP 1 { NOW } ;
+                  COMPARE ;
+                  LT ;
+                  DIP 1
+                      { DUP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DIP 1 { DROP 1 } } ;
+                  DIP 2
+                      { DUP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        DIP 1 { DROP 1 } } ;
+                  DIP 1 { COMPARE ; LT } ;
+                  OR ;
+                  DIP 1
+                      { DUP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 } ;
+                  DIP 2
+                      { DUP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DIP 1 { DROP 1 } } ;
+                  DIP 1 { COMPARE ; LT } ;
+                  OR ;
+                  IF { PUSH string "timestamp parameters given in wrong order" ; FAILWITH } {} ;
+                  DUP ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  DIP 1 { DROP 1 } ;
+                  NOW ;
+                  SWAP ;
+                  SUB ;
+                  PUSH int 7776000 ;
+                  SWAP ;
+                  COMPARE ;
+                  GT ;
+                  IF { PUSH string "funding_start too late" ; FAILWITH } {} ;
+                  DUP ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DIP 1 { DROP 1 } ;
+                  DIP 1
+                      { DUP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        DIP 1 { DROP 1 } } ;
+                  SUB ;
+                  PUSH int 23328000 ;
+                  SWAP ;
+                  COMPARE ;
+                  GT ;
+                  IF { PUSH string "funding period too long" ; FAILWITH } {} ;
+                  DUP ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                  DROP 1 ;
+                  DIP 1
+                      { DUP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DROP 1 ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DIP 1 { DROP 1 } } ;
+                  SUB ;
+                  PUSH int 7776000 ;
+                  SWAP ;
+                  COMPARE ;
+                  GT ;
+                  IF { PUSH string "redeem period too long" ; FAILWITH } {} ;
+                  DROP 1 } } ;
+        DIP 1
+            { NIL (pair (pair string (lambda (pair bytes bytes) (pair (list operation) bytes)))
+                        (pair bytes mutez)) } ;
+        LAMBDA
+          (pair bytes bytes)
+          (pair (list operation) bytes)
+          { { DUP ; CAR ; DIP 1 { CDR } } ;
+            UNPACK (or key_hash (or address address)) ;
+            IF_NONE
+              { PUSH string "unpack param" ; FAILWITH }
+              { SWAP ;
+                UNPACK
+                  (pair (pair (set address) (map address mutez))
+                        (pair (pair bool timestamp) (pair timestamp timestamp))) ;
+                IF_NONE
+                  { PUSH string "unpack storage" ; FAILWITH }
+                  { SWAP ;
+                    PAIR ;
+                    DUP ;
+                    CAR ;
+                    DIP 1 { CDR } ;
+                    IF_LEFT
+                      { IMPLICIT_ACCOUNT ;
+                        ADDRESS ;
+                        DUP ;
+                        DIP 2
+                            { DUP ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              DIP 1 { DROP 1 } ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              DROP 1 } ;
+                        DIP 1 { GET } ;
+                        DIP 1 { IF_SOME { AMOUNT ; ADD } { AMOUNT } } ;
+                        DIP 1 { SOME } ;
+                        DIP 2
+                            { DUP ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              DIP 1 { DROP 1 } ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              DROP 1 } ;
+                        UPDATE ;
+                        DIP 1
+                            { DUP ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              DROP 1 ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                              DROP 1 ;
+                              DIP 1 { DROP 1 } ;
+                              NOW ;
+                              COMPARE ;
+                              GE ;
+                              DIP 1
+                                  { DUP ;
+                                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                                    DROP 1 ;
+                                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                                    DROP 1 ;
+                                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                                    DIP 1 { DROP 1 } } ;
+                              DIP 1 { NOW ; SWAP ; COMPARE ; GE } ;
+                              AND ;
+                              NOT ;
+                              IF { FAILWITH } {} } ;
+                        SWAP ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                        DIP 1 { DROP 1 ; SWAP } ;
+                        PAIR ;
+                        PAIR ;
+                        NIL operation ;
+                        PAIR }
+                      { IF_LEFT
+                          { DIP 1
+                                { DUP ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DROP 1 ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DROP 1 ;
+                                  DIP 1 { DROP 1 } ;
+                                  NOW ;
+                                  COMPARE ;
+                                  GE ;
+                                  DIP 1
+                                      { DUP ;
+                                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                                        DROP 1 ;
+                                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                                        DROP 1 ;
+                                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                                        DIP 1 { DROP 1 } } ;
+                                  DIP 1 { NOW ; SWAP ; COMPARE ; GE } ;
+                                  AND ;
+                                  NOT ;
+                                  DIP 1
+                                      { NOW ;
+                                        DIP 1
+                                            { DUP ;
+                                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                                              DROP 1 ;
+                                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                                              DROP 1 ;
+                                              { DUP ; CAR ; DIP 1 { CDR } } ;
+                                              DROP 1 } ;
+                                        SWAP ;
+                                        COMPARE ;
+                                        LE } ;
+                                  OR ;
+                                  IF { FAILWITH } {} ;
+                                  DUP ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DROP 1 ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DIP 1 { DROP 1 } ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DIP 1 { DROP 1 } ;
+                                  IF { FAILWITH } {} ;
+                                  DUP ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DIP 1 { DROP 1 } ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DIP 1 { DROP 1 } ;
+                                  SOURCE ;
+                                  MEM ;
+                                  NOT ;
+                                  IF { FAILWITH } {} } ;
+                            BALANCE ;
+                            DIP 1 { CONTRACT unit } ;
+                            SWAP ;
+                            IF_NONE { FAILWITH } { SWAP ; UNIT ; TRANSFER_TOKENS } ;
+                            NIL operation ;
+                            SWAP ;
+                            CONS ;
+                            DIP 1
+                                { { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DIP 1
+                                      { { DUP ; CAR ; DIP 1 { CDR } } ;
+                                        { DUP ; CAR ; DIP 1 { CDR } } ;
+                                        DROP 1 ;
+                                        PUSH bool True ;
+                                        PAIR ;
+                                        PAIR } ;
+                                  PAIR } ;
+                            PAIR }
+                          { DIP 1
+                                { DUP ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DIP 1 { DROP 1 } ;
+                                  { DUP ; CAR ; DIP 1 { CDR } } ;
+                                  DROP 1 } ;
+                            DUP ;
+                            DIP 1 { GET } ;
+                            SWAP ;
+                            IF_NONE
+                              { FAILWITH }
+                              { SWAP ;
+                                DIP 1 { SWAP } ;
+                                NONE mutez ;
+                                DIP 2
+                                    { DUP ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      DIP 1 { DROP 1 } ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      DROP 1 } ;
+                                SWAP ;
+                                DUP ;
+                                DIP 1 { UPDATE } ;
+                                DIP 2
+                                    { NOW ;
+                                      DIP 1
+                                          { DUP ;
+                                            { DUP ; CAR ; DIP 1 { CDR } } ;
+                                            DROP 1 ;
+                                            { DUP ; CAR ; DIP 1 { CDR } } ;
+                                            DROP 1 ;
+                                            { DUP ; CAR ; DIP 1 { CDR } } ;
+                                            DROP 1 } ;
+                                      SWAP ;
+                                      COMPARE ;
+                                      GT ;
+                                      IF { FAILWITH } {} ;
+                                      DUP ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      DROP 1 ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      DIP 1 { DROP 1 } ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      DIP 1 { DROP 1 } ;
+                                      IF { FAILWITH } {} } ;
+                                DIP 1
+                                    { SWAP ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      { DUP ; CAR ; DIP 1 { CDR } } ;
+                                      DIP 1 { DROP 1 ; SWAP } ;
+                                      PAIR ;
+                                      PAIR } ;
+                                DIP 1 { SWAP } ;
+                                SWAP ;
+                                DIP 1 { CONTRACT unit } ;
+                                SWAP ;
+                                IF_NONE { FAILWITH } { SWAP ; UNIT ; TRANSFER_TOKENS } ;
+                                NIL operation ;
+                                SWAP ;
+                                CONS ;
+                                PAIR } } } ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    DIP 1 { PACK } ;
+                    PAIR } } } ;
+        PUSH string "main" ;
+        PAIR ;
+        PAIR ;
+        CONS }
+      { DROP 1 ;
+        LAMBDA
+          (map string address)
+          (list (pair string bytes))
+          { DROP 1 ; NIL (pair string bytes) } })

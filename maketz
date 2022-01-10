@@ -1,0 +1,14 @@
+#!/bin/bash
+TMP=$(mktemp)
+coqtop -q -R . tscaformaldev << EOF | sed -e 's/""/"/g' | sed -e ':loop;N;$!b loop;s/\n/ /g' | grep -oP "\{[\s\S]*\}" > $TMP
+Require Import String.
+From Michocoq Require Import semantics util macros.
+From tscaformaldev Require Import util.
+From tscaformaldev Require Import $1.
+Module out (C : ContractContext).
+Module O := $1 C.
+Open Scope string_scope.
+Compute pp O.$1.
+End out.
+EOF
+./michelson-reformat < $TMP > $2

@@ -1,0 +1,71 @@
+(Pair { DUP ;
+        DIP 1
+            { { DUP ; CAR ; DIP 1 { CDR } } ; UNPACK (pair (set address) timestamp) } ;
+        DIP 1
+            { IF_NONE
+                { PUSH string "genparam is of wrong type" ; FAILWITH }
+                { DROP 1 ; DROP 1 } } ;
+        DIP 1
+            { NIL (pair (pair string (lambda (pair bytes bytes) (pair (list operation) bytes)))
+                        (pair bytes mutez)) } ;
+        LAMBDA
+          (pair bytes bytes)
+          (pair (list operation) bytes)
+          { { DUP ; CAR ; DIP 1 { CDR } } ;
+            UNPACK (pair mutez address) ;
+            IF_NONE
+              { PUSH string "unpack param" ; FAILWITH }
+              { SWAP ;
+                UNPACK (pair (set address) timestamp) ;
+                IF_NONE
+                  { PUSH string "unpack storage" ; FAILWITH }
+                  { SWAP ;
+                    PAIR ;
+                    DUP ;
+                    AMOUNT ;
+                    PUSH mutez 0 ;
+                    COMPARE ;
+                    NEQ ;
+                    IF { FAILWITH } {} ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    DIP 1 { { DUP ; CAR ; DIP 1 { CDR } } } ;
+                    SWAP ;
+                    SOURCE ;
+                    MEM ;
+                    IF {} { FAILWITH } ;
+                    SWAP ;
+                    NOW ;
+                    COMPARE ;
+                    LT ;
+                    IF { FAILWITH } {} ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    DUP ;
+                    BALANCE ;
+                    COMPARE ;
+                    LT ;
+                    IF { FAILWITH } {} ;
+                    PUSH mutez 0 ;
+                    COMPARE ;
+                    EQ ;
+                    IF { FAILWITH } {} ;
+                    DROP 1 ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    SWAP ;
+                    CONTRACT unit ;
+                    IF_NONE { FAILWITH } { SWAP ; PUSH unit Unit ; TRANSFER_TOKENS } ;
+                    DIP 1 { NIL operation } ;
+                    CONS ;
+                    PAIR ;
+                    { DUP ; CAR ; DIP 1 { CDR } } ;
+                    DIP 1 { PACK } ;
+                    PAIR } } } ;
+        PUSH string "main" ;
+        PAIR ;
+        PAIR ;
+        CONS }
+      { DROP 1 ;
+        LAMBDA
+          (map string address)
+          (list (pair string bytes))
+          { DROP 1 ; NIL (pair string bytes) } })

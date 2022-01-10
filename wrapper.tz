@@ -1,0 +1,19 @@
+{ parameter bytes ;
+  storage
+    (pair bytes
+          (pair (lambda (pair bytes bytes) (pair (list operation) bytes))
+                (option (pair address (pair string string))))) ;
+  code { DUP ;
+         CDR ;
+         CDR ;
+         CAR ;
+         { DIP 1 { DUP } ; SWAP } ;
+         CDAR ;
+         { DIG 2 ; DUP ; DIP 1 { DUG 2 } } ;
+         CAR ;
+         PAIR ;
+         EXEC ;
+         DUP ;
+         CAR ;
+         DIP 1 { CDR ; DIP 1 { CDDR } ; PAIR } ;
+         PAIR } }
